@@ -34,15 +34,9 @@
 </template>
 
 <script setup>
+import { actionClass } from '../../utils/format'
+
 defineProps({
   recommendations: { type: Array, default: () => [] },
 })
-
-function actionClass(action) {
-  switch (action) {
-    case 'BUY': return 'bg-emerald-500/20 text-emerald-400'
-    case 'SELL': return 'bg-rose-500/20 text-rose-400'
-    default: return 'bg-amber-500/20 text-amber-400'
-  }
-}
 </script>

@@ -13,11 +13,8 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(name)s: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
-# Quiet down noisy third-party loggers
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("httpcore").setLevel(logging.WARNING)
-logging.getLogger("yfinance").setLevel(logging.WARNING)
-logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
+for noisy_logger in ("httpx", "httpcore", "yfinance", "sqlalchemy", "openrouter"):
+    logging.getLogger(noisy_logger).setLevel(logging.WARNING)
 
 log = logging.getLogger(__name__)
 

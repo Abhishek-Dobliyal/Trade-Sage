@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.database import get_db
 from app.db.models import Holding
-from app.services.csv_parser import EXPECTED_SCHEMA, parse_portfolio_csv
+from app.services.csv_parser import parse_portfolio_csv
 
 log = logging.getLogger(__name__)
 

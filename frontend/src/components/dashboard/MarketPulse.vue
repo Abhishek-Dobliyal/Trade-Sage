@@ -31,12 +31,9 @@
 </template>
 
 <script setup>
+import { formatNum } from '../../utils/format'
+
 defineProps({
   indices: { type: Array, default: () => [] },
 })
-
-function formatNum(n) {
-  if (n == null) return '—'
-  return n.toLocaleString('en-IN', { maximumFractionDigits: 2 })
-}
 </script>

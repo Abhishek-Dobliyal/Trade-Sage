@@ -48,24 +48,23 @@ async def dashboard(db: AsyncSession = Depends(get_db)) -> dict:
     holdings = holdings_result.scalars().all()
     recommendations = recs_result.scalars().all()
 
-    indices_task = asyncio.to_thread(get_index_quotes)
-    news_task = fetch_news(max_items=5)
+    results = await asyncio.gather(
+        asyncio.to_thread(get_index_quotes),
+        fetch_news(max_items=5),
+        return_exceptions=True,
+    )
 
-    indices = []
-    news = []
-    try:
-        indices, news = await asyncio.gather(indices_task, news_task)
-    except Exception:
-        log.exception("Failed to fetch market data or news for dashboard")
-        # Try them individually so one failure doesn't kill both
-        try:
-            indices = await indices_task
-        except Exception:
-            log.exception("Failed to fetch indices for dashboard")
-        try:
-            news = await news_task
-        except Exception:
-            log.exception("Failed to fetch news for dashboard")
+    if isinstance(results[0], Exception):
+        log.exception("Failed to fetch indices for dashboard", exc_info=results[0])
+        indices = []
+    else:
+        indices = results[0]
+
+    if isinstance(results[1], Exception):
+        log.exception("Failed to fetch news for dashboard", exc_info=results[1])
+        news = []
+    else:
+        news = results[1]
 
     return {
         "portfolio": _build_portfolio_summary(holdings) if holdings else None,

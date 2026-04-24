@@ -4,19 +4,20 @@ import { streamChat } from '../api/client'
 const messages = ref([])
 const conversationId = ref(null)
 const streaming = ref(false)
+const thinking = ref(false)
 
 export function useChat() {
   async function sendMessage(text) {
     messages.value.push({ role: 'user', content: text })
-    messages.value.push({ role: 'assistant', content: '' })
+    thinking.value = true
     streaming.value = true
 
     try {
       const response = await streamChat(text, conversationId.value)
       const reader = response.body.getReader()
       const decoder = new TextDecoder()
-      const assistantIdx = messages.value.length - 1
       let buffer = ''
+      let assistantIdx = -1
 
       while (true) {
         const { done, value } = await reader.read()
@@ -35,6 +36,11 @@ export function useChat() {
               conversationId.value = parsed.conversation_id
             }
             if (parsed.text) {
+              if (thinking.value) {
+                thinking.value = false
+                messages.value.push({ role: 'assistant', content: '' })
+                assistantIdx = messages.value.length - 1
+              }
               messages.value[assistantIdx].content += parsed.text
             }
           } catch {
@@ -43,12 +49,16 @@ export function useChat() {
         }
       }
     } catch (err) {
+      thinking.value = false
       const last = messages.value[messages.value.length - 1]
       if (last.role === 'assistant' && !last.content) {
         last.content = 'Failed to get response. Please try again.'
+      } else if (last.role === 'user') {
+        messages.value.push({ role: 'assistant', content: 'Failed to get response. Please try again.' })
       }
     } finally {
       streaming.value = false
+      thinking.value = false
     }
   }
 
@@ -57,5 +67,5 @@ export function useChat() {
     conversationId.value = null
   }
 
-  return { messages, conversationId, streaming, sendMessage, clearChat }
+  return { messages, conversationId, streaming, thinking, sendMessage, clearChat }
 }

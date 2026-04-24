@@ -52,17 +52,9 @@ import PortfolioSummary from '../components/dashboard/PortfolioSummary.vue'
 import RecentRecs from '../components/dashboard/RecentRecs.vue'
 import { useDashboard } from '../composables/useDashboard'
 
+import { formatTime } from '../utils/format'
+
 const { data, loading, error, fetchDashboard } = useDashboard()
 
 onMounted(fetchDashboard)
-
-function formatTime(iso) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  const now = new Date()
-  const diff = Math.floor((now - d) / 60000)
-  if (diff < 60) return `${diff}m ago`
-  if (diff < 1440) return `${Math.floor(diff / 60)}h ago`
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
-}
 </script>

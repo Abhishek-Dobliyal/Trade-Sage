@@ -34,15 +34,31 @@ Recent News:
 
 RECOMMENDATION_PROMPT = """Based on the portfolio below and current market conditions, generate specific buy/sell/hold recommendations.
 
-For each recommendation, provide:
-- Action: BUY / SELL / HOLD
-- Symbol and name
-- Rationale (2-3 sentences)
-- Confidence level (0.0 to 1.0)
-- Target price (if applicable)
-- Stop loss (if applicable)
+Respond ONLY with valid JSON. No markdown, no code fences, no explanation outside the JSON.
+Always wrap the array under a "data" key. Use exactly these field names:
 
-Respond in valid JSON format as a list of recommendation objects.
+{{
+  "data": [
+    {{
+      "symbol": "RELIANCE",
+      "name": "Reliance Industries Ltd",
+      "action": "BUY",
+      "rationale": "Strong quarterly results and expanding retail business...",
+      "confidence": 0.75,
+      "target_price": 2800.00,
+      "stop_loss": 2300.00
+    }}
+  ]
+}}
+
+Field rules:
+- "symbol": stock ticker or MF scheme code (string)
+- "name": full company or scheme name (string)
+- "action": exactly one of "BUY", "SELL", or "HOLD" (string)
+- "rationale": 2-3 sentence explanation (string)
+- "confidence": number between 0.0 and 1.0
+- "target_price": number in INR or null
+- "stop_loss": number in INR or null
 
 Portfolio:
 {holdings}

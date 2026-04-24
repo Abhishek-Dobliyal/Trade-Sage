@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from functools import partial
 
 from fastapi import APIRouter, HTTPException
 
@@ -11,19 +10,14 @@ log = logging.getLogger(__name__)
 router = APIRouter(prefix="/market", tags=["market"])
 
 
-def _run_sync(func, *args, **kwargs):
-    """Run a sync function in a thread to avoid blocking the event loop."""
-    return asyncio.to_thread(partial(func, *args, **kwargs))
-
-
 @router.get("/indices")
 async def indices() -> list[dict]:
-    return await _run_sync(get_index_quotes)
+    return await asyncio.to_thread(get_index_quotes)
 
 
 @router.get("/quote/{symbol}")
 async def quote(symbol: str) -> dict:
-    result = await _run_sync(get_stock_price, symbol.upper())
+    result = await asyncio.to_thread(get_stock_price, symbol.upper())
     if result is None:
         raise HTTPException(status_code=404, detail=f"No data found for {symbol}")
     return result
@@ -31,4 +25,4 @@ async def quote(symbol: str) -> dict:
 
 @router.get("/history/{symbol}")
 async def history(symbol: str, period: str = "6mo", interval: str = "1d") -> list[dict]:
-    return await _run_sync(get_stock_history, symbol.upper(), period, interval)
+    return await asyncio.to_thread(get_stock_history, symbol.upper(), period, interval)

@@ -36,13 +36,13 @@
       </div>
 
       <template v-if="holdings.length">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="space-y-6">
           <!-- Holdings Table -->
-          <div class="lg:col-span-2 bg-gray-800 border border-gray-700 rounded-xl overflow-hidden">
-            <div class="p-4 border-b border-gray-700">
+          <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden flex flex-col max-h-[28rem]">
+            <div class="p-4 border-b border-gray-700 shrink-0">
               <h3 class="text-sm font-medium text-gray-400">Holdings ({{ holdings.length }})</h3>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-auto">
               <table class="w-full text-sm">
                 <thead>
                   <tr class="text-left text-xs text-gray-500 border-b border-gray-700">
@@ -83,10 +83,12 @@
             </div>
           </div>
 
-          <!-- Sector Pie Chart -->
+          <!-- Sector Allocation Chart -->
           <div class="bg-gray-800 border border-gray-700 rounded-xl p-5">
             <h3 class="text-sm font-medium text-gray-400 mb-4">Sector Allocation</h3>
-            <Pie v-if="sectorData" :data="sectorData" :options="chartOptions" />
+            <div v-if="sectorEntries.length" class="h-64">
+              <Bar :data="barData" :options="barOptions" />
+            </div>
             <div v-else class="text-gray-500 text-sm text-center py-8">
               No sector data available
             </div>
@@ -103,12 +105,19 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { Pie } from 'vue-chartjs'
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import { Bar } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+} from 'chart.js'
 import PageHeader from '../components/layout/PageHeader.vue'
 import { usePortfolio } from '../composables/usePortfolio'
+import { formatNum } from '../utils/format'
 
-ChartJS.register(ArcElement, Tooltip, Legend)
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip)
 
 const { holdings, loading, error, fetchHoldings, importCsv, clearHoldings } = usePortfolio()
 const importStatus = ref(null)
@@ -120,30 +129,64 @@ const CHART_COLORS = [
   '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1',
 ]
 
-const sectorData = computed(() => {
+const sectorEntries = computed(() => {
   const sectorMap = {}
+  let total = 0
   for (const h of holdings.value) {
     const sector = h.sector || 'Uncategorized'
-    sectorMap[sector] = (sectorMap[sector] || 0) + h.quantity * h.avg_price
+    const value = h.quantity * h.avg_price
+    sectorMap[sector] = (sectorMap[sector] || 0) + value
+    total += value
   }
-  const labels = Object.keys(sectorMap)
-  if (!labels.length) return null
-  return {
-    labels,
-    datasets: [{
-      data: Object.values(sectorMap).map(v => Math.round(v)),
-      backgroundColor: CHART_COLORS.slice(0, labels.length),
-      borderWidth: 0,
-    }],
-  }
+  return Object.entries(sectorMap)
+    .map(([sector, value]) => ({
+      sector,
+      value: Math.round(value),
+      pct: total > 0 ? (value / total) * 100 : 0,
+    }))
+    .sort((a, b) => b.value - a.value)
 })
 
-const chartOptions = {
+const barData = computed(() => ({
+  labels: sectorEntries.value.map(e => e.sector),
+  datasets: [{
+    data: sectorEntries.value.map(e => e.pct),
+    backgroundColor: sectorEntries.value.map((_, i) => CHART_COLORS[i % CHART_COLORS.length]),
+    borderWidth: 0,
+    borderRadius: 4,
+    barThickness: 22,
+  }],
+}))
+
+const barOptions = {
+  indexAxis: 'y',
   responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    x: {
+      ticks: {
+        color: '#6b7280',
+        font: { size: 10 },
+        callback: (v) => v + '%',
+      },
+      grid: { color: 'rgba(75, 85, 99, 0.2)' },
+    },
+    y: {
+      ticks: { color: '#9ca3af', font: { size: 11 } },
+      grid: { display: false },
+    },
+  },
   plugins: {
-    legend: {
-      position: 'bottom',
-      labels: { color: '#9ca3af', font: { size: 11 }, padding: 12 },
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: '#1f2937',
+      titleColor: '#e5e7eb',
+      bodyColor: '#9ca3af',
+      borderColor: '#374151',
+      borderWidth: 1,
+      callbacks: {
+        label: (ctx) => `${ctx.parsed.x.toFixed(1)}%`,
+      },
     },
   },
 }
@@ -171,10 +214,5 @@ async function uploadFile(file) {
 async function handleClear() {
   await clearHoldings()
   importStatus.value = null
-}
-
-function formatNum(n) {
-  if (n == null) return '—'
-  return n.toLocaleString('en-IN', { maximumFractionDigits: 2 })
 }
 </script>

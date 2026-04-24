@@ -82,26 +82,15 @@ import { onMounted } from 'vue'
 import PageHeader from '../components/layout/PageHeader.vue'
 import { useRecommendations } from '../composables/useRecommendations'
 
+import { formatNum, actionClass } from '../utils/format'
+
 const { recommendations, loading, generating, error, fetchRecommendations, generateRecommendations } = useRecommendations()
 
 onMounted(fetchRecommendations)
-
-function actionClass(action) {
-  switch (action) {
-    case 'BUY': return 'bg-emerald-500/20 text-emerald-400'
-    case 'SELL': return 'bg-rose-500/20 text-rose-400'
-    default: return 'bg-amber-500/20 text-amber-400'
-  }
-}
 
 function confidenceColor(c) {
   if (c >= 0.7) return 'bg-emerald-500'
   if (c >= 0.4) return 'bg-amber-500'
   return 'bg-rose-500'
-}
-
-function formatNum(n) {
-  if (n == null) return '—'
-  return n.toLocaleString('en-IN', { maximumFractionDigits: 2 })
 }
 </script>

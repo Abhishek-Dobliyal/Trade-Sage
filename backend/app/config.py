@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     openrouter_api_key: str = ""
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
-    default_model: str = "google/gemini-2.0-flash-001"
+    default_model: str = "openrouter/free"
 
     news_rss_feeds: list[str] = [
         "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",

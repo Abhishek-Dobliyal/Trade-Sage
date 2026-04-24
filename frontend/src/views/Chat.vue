@@ -57,6 +57,20 @@
           ></span>
         </div>
       </div>
+
+      <!-- Thinking indicator -->
+      <div v-if="thinking" class="flex justify-start">
+        <div class="bg-gray-800 border border-gray-700 rounded-2xl rounded-bl-md px-5 py-4 animate__animated animate__fadeIn">
+          <div class="flex items-center gap-3">
+            <div class="flex gap-1">
+              <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+              <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+              <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+            </div>
+            <span class="text-xs text-gray-500">Analyzing...</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="p-4 border-t border-gray-800 bg-gray-900/50">
@@ -86,7 +100,7 @@ import { marked } from 'marked'
 import PageHeader from '../components/layout/PageHeader.vue'
 import { useChat } from '../composables/useChat'
 
-const { messages, streaming, sendMessage, clearChat } = useChat()
+const { messages, streaming, thinking, sendMessage, clearChat } = useChat()
 const input = ref('')
 const messagesContainer = ref(null)
 
@@ -109,21 +123,14 @@ async function handleSubmit() {
   await sendMessage(text)
 }
 
-watch(
-  () => messages.value.length,
-  () => nextTick(() => {
+function scrollToBottom() {
+  nextTick(() => {
     if (messagesContainer.value) {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
     }
-  }),
-)
+  })
+}
 
-watch(
-  () => messages.value[messages.value.length - 1]?.content,
-  () => nextTick(() => {
-    if (messagesContainer.value) {
-      messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
-    }
-  }),
-)
+watch(() => messages.value.length, scrollToBottom)
+watch(() => messages.value[messages.value.length - 1]?.content, scrollToBottom)
 </script>

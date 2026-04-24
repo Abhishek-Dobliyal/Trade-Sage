@@ -120,6 +120,8 @@ import { useMarket } from '../composables/useMarket'
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Filler)
 
+import { formatNum, formatTime } from '../utils/format'
+
 const { indices, news, quote, history, loading: searchLoading, error: searchError, fetchIndices, fetchNews, fetchQuote, fetchHistory } = useMarket()
 const searchSymbol = ref('')
 
@@ -177,18 +179,5 @@ const chartOptions = {
   },
 }
 
-function formatNum(n) {
-  if (n == null) return '—'
-  return n.toLocaleString('en-IN', { maximumFractionDigits: 2 })
-}
 
-function formatTime(iso) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  const now = new Date()
-  const diff = Math.floor((now - d) / 60000)
-  if (diff < 60) return `${diff}m ago`
-  if (diff < 1440) return `${Math.floor(diff / 60)}h ago`
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
-}
 </script>
