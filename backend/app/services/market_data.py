@@ -5,6 +5,16 @@ import yfinance as yf
 log = logging.getLogger(__name__)
 
 
+def get_bulk_prices(symbols: list[str]) -> dict[str, dict]:
+    """Fetch current prices for multiple NSE symbols in batch."""
+    results = {}
+    for symbol in symbols:
+        price = get_stock_price(symbol)
+        if price:
+            results[symbol] = price
+    return results
+
+
 def get_stock_price(symbol: str) -> dict | None:
     """Fetch current price info for an NSE/BSE stock."""
     ticker = yf.Ticker(f"{symbol}.NS")

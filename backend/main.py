@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.db.database import init_db
-from app.routers import chat, dashboard, market, news, portfolio, recommendations
+from app.routers import chat, dashboard, market, news, portfolio, recommendations, watchlist
 
 logging.basicConfig(
     level=logging.DEBUG if settings.debug else logging.INFO,
@@ -48,8 +48,24 @@ app.include_router(chat.router, prefix="/api")
 app.include_router(news.router, prefix="/api")
 app.include_router(recommendations.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
+app.include_router(watchlist.router, prefix="/api")
 
 
 @app.get("/api/health")
 async def health():
     return {"status": "ok", "app": settings.app_name}
+
+
+@app.get("/api/models")
+async def available_models():
+    return {
+        "default": settings.default_model,
+        "models": [
+            {"id": "openrouter/free", "name": "Auto (Free)"},
+            {"id": "google/gemma-4-26b-a4b-it:free", "name": "Gemma 4 26B"},
+            {"id": "google/gemma-3-12b-it:free", "name": "Gemma 3 12B"},
+            {"id": "nvidia/nemotron-3-super-120b-a12b:free", "name": "Nemotron 120B"},
+            {"id": "deepseek/deepseek-chat-v3-0324:free", "name": "DeepSeek V3"},
+            {"id": "meta-llama/llama-4-maverick:free", "name": "Llama 4 Maverick"},
+        ],
+    }

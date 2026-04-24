@@ -2,7 +2,9 @@ import { ref } from 'vue'
 import api from '../api/client'
 
 const holdings = ref([])
+const valuation = ref(null)
 const loading = ref(false)
+const valuationLoading = ref(false)
 const error = ref(null)
 
 export function usePortfolio() {
@@ -19,6 +21,19 @@ export function usePortfolio() {
     }
   }
 
+  async function fetchValuation() {
+    valuationLoading.value = true
+    error.value = null
+    try {
+      const res = await api.get('/portfolio/valuation')
+      valuation.value = res.data
+    } catch (err) {
+      error.value = err.response?.data?.detail || err.message
+    } finally {
+      valuationLoading.value = false
+    }
+  }
+
   async function importCsv(file) {
     const formData = new FormData()
     formData.append('file', file)
@@ -30,6 +45,7 @@ export function usePortfolio() {
   async function clearHoldings() {
     await api.delete('/portfolio/holdings')
     holdings.value = []
+    valuation.value = null
   }
 
   async function fetchCsvSchema() {
@@ -37,5 +53,8 @@ export function usePortfolio() {
     return res.data
   }
 
-  return { holdings, loading, error, fetchHoldings, importCsv, clearHoldings, fetchCsvSchema }
+  return {
+    holdings, valuation, loading, valuationLoading, error,
+    fetchHoldings, fetchValuation, importCsv, clearHoldings, fetchCsvSchema,
+  }
 }

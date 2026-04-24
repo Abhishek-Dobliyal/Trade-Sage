@@ -5,6 +5,7 @@ const messages = ref([])
 const conversationId = ref(null)
 const streaming = ref(false)
 const thinking = ref(false)
+const selectedModel = ref(null)
 
 export function useChat() {
   async function sendMessage(text) {
@@ -13,7 +14,7 @@ export function useChat() {
     streaming.value = true
 
     try {
-      const response = await streamChat(text, conversationId.value)
+      const response = await streamChat(text, conversationId.value, selectedModel.value)
       const reader = response.body.getReader()
       const decoder = new TextDecoder()
       let buffer = ''
@@ -67,5 +68,5 @@ export function useChat() {
     conversationId.value = null
   }
 
-  return { messages, conversationId, streaming, thinking, sendMessage, clearChat }
+  return { messages, conversationId, streaming, thinking, selectedModel, sendMessage, clearChat }
 }

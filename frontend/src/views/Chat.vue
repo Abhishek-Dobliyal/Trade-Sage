@@ -1,13 +1,23 @@
 <template>
   <div class="flex flex-col h-screen">
     <PageHeader title="Chat with TradeSage">
-      <button
-        v-if="messages.length"
-        class="text-sm text-gray-500 hover:text-gray-300 transition-colors"
-        @click="clearChat"
-      >
-        <i class="fa-solid fa-rotate-right mr-1"></i> New Chat
-      </button>
+      <div class="flex items-center gap-3">
+        <select
+          v-model="selectedModel"
+          class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-emerald-500 transition-colors"
+        >
+          <option v-for="m in models" :key="m.id" :value="m.id">
+            {{ m.name }}
+          </option>
+        </select>
+        <button
+          v-if="messages.length"
+          class="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+          @click="clearChat"
+        >
+          <i class="fa-solid fa-rotate-right mr-1"></i> New Chat
+        </button>
+      </div>
     </PageHeader>
 
     <div ref="messagesContainer" class="flex-1 overflow-y-auto p-6 space-y-4">
@@ -51,7 +61,6 @@
             v-html="renderMarkdown(msg.content)"
           ></div>
           <span v-else>{{ msg.content }}</span>
-
         </div>
       </div>
 
@@ -89,14 +98,28 @@
 </template>
 
 <script setup>
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick, watch, onMounted } from 'vue'
 import { marked } from 'marked'
+import api from '../api/client'
 import PageHeader from '../components/layout/PageHeader.vue'
 import { useChat } from '../composables/useChat'
 
-const { messages, streaming, thinking, sendMessage, clearChat } = useChat()
+const { messages, streaming, thinking, selectedModel, sendMessage, clearChat } = useChat()
 const input = ref('')
 const messagesContainer = ref(null)
+const models = ref([{ id: 'openrouter/free', name: 'Auto (Free)' }])
+
+onMounted(async () => {
+  try {
+    const res = await api.get('/models')
+    models.value = res.data.models
+    if (!selectedModel.value) {
+      selectedModel.value = res.data.default
+    }
+  } catch {
+    // fallback already set
+  }
+})
 
 const promptChips = [
   'Analyze my portfolio risk',

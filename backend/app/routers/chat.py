@@ -23,6 +23,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 class ChatRequest(BaseModel):
     message: str
     conversation_id: str | None = None
+    model: str | None = None
     stream: bool = True
 
 
@@ -90,7 +91,7 @@ async def chat(req: ChatRequest, db: AsyncSession = Depends(get_db)):
 
     if req.stream:
         return StreamingResponse(
-            _stream_and_persist(messages, conversation_id, db),
+            _stream_and_persist(messages, conversation_id, db, model=req.model),
             media_type="text/event-stream",
             headers={
                 "X-Conversation-Id": conversation_id,
@@ -98,7 +99,7 @@ async def chat(req: ChatRequest, db: AsyncSession = Depends(get_db)):
             },
         )
 
-    response = await chat_completion(messages, stream=False)
+    response = await chat_completion(messages, model=req.model, stream=False)
     db.add(
         ChatMessage(
             conversation_id=conversation_id,
@@ -111,10 +112,10 @@ async def chat(req: ChatRequest, db: AsyncSession = Depends(get_db)):
 
 
 async def _stream_and_persist(
-    messages: list[dict], conversation_id: str, db: AsyncSession
+    messages: list[dict], conversation_id: str, db: AsyncSession, model: str | None = None
 ):
     full_content = []
-    generator = await chat_completion(messages, stream=True)
+    generator = await chat_completion(messages, model=model, stream=True)
     async for chunk in generator:
         text = chunk.get("text", "")
         if text:

@@ -55,6 +55,7 @@ const navItems = [
   { path: '/chat', label: 'Chat', icon: 'fa-solid fa-comments' },
   { path: '/portfolio', label: 'Portfolio', icon: 'fa-solid fa-briefcase' },
   { path: '/recommendations', label: 'Recommendations', icon: 'fa-solid fa-lightbulb' },
+  { path: '/watchlist', label: 'Watchlist', icon: 'fa-solid fa-binoculars' },
   { path: '/market', label: 'Market & News', icon: 'fa-solid fa-chart-line' },
 ]
 

@@ -1,14 +1,23 @@
 <template>
   <div class="flex flex-col h-screen">
     <PageHeader title="Recommendations">
-      <button
-        class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-lg text-sm font-medium transition-colors"
-        :disabled="generating"
-        @click="generateRecommendations"
-      >
-        <i :class="['fa-solid', generating ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles']"></i>
-        {{ generating ? 'Generating...' : 'Generate' }}
-      </button>
+      <div class="flex items-center gap-2">
+        <a
+          v-if="recommendations.length"
+          href="/api/recommendations/export"
+          class="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-xs text-gray-400 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors"
+        >
+          <i class="fa-solid fa-download"></i> Export CSV
+        </a>
+        <button
+          class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-lg text-sm font-medium transition-colors"
+          :disabled="generating"
+          @click="generateRecommendations"
+        >
+          <i :class="['fa-solid', generating ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles']"></i>
+          {{ generating ? 'Generating...' : 'Generate' }}
+        </button>
+      </div>
     </PageHeader>
 
     <div class="flex-1 overflow-y-auto p-6">

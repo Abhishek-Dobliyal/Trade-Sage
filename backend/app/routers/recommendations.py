@@ -164,3 +164,38 @@ async def list_recommendations(db: AsyncSession = Depends(get_db)) -> list[dict]
         select(Recommendation).order_by(Recommendation.created_at.desc())
     )
     return [_serialize_recommendation(r) for r in result.scalars().all()]
+
+
+@router.get("/export")
+async def export_recommendations(db: AsyncSession = Depends(get_db)):
+    """Export recommendations as a downloadable CSV."""
+    from fastapi.responses import StreamingResponse
+    import io
+    import csv
+
+    result = await db.execute(
+        select(Recommendation).order_by(Recommendation.created_at.desc())
+    )
+    recs = result.scalars().all()
+    if not recs:
+        raise HTTPException(status_code=400, detail="No recommendations to export.")
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Symbol", "Name", "Action", "Confidence", "Target Price", "Stop Loss", "Rationale", "Generated At"])
+    for r in recs:
+        writer.writerow([
+            r.symbol, r.name, r.action,
+            f"{r.confidence:.0%}",
+            r.target_price or "",
+            r.stop_loss or "",
+            r.rationale,
+            r.created_at.isoformat() if r.created_at else "",
+        ])
+
+    output.seek(0)
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=recommendations.csv"},
+    )

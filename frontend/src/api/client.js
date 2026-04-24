@@ -5,10 +5,11 @@ const api = axios.create({
   timeout: 60000,
 })
 
-export function streamChat(message, conversationId = null) {
+export function streamChat(message, conversationId = null, model = null) {
   const body = JSON.stringify({
     message,
     conversation_id: conversationId,
+    model,
     stream: true,
   })
 

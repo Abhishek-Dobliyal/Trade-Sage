@@ -51,6 +51,18 @@ class Recommendation(Base):
     )
 
 
+class Watchlist(Base):
+    __tablename__ = "watchlist"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    symbol = Column(String(20), nullable=False, unique=True, index=True)
+    name = Column(String(200), nullable=False)
+    notes = Column(Text, default="")
+    added_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
+    )
+
+
 class AnalysisSnapshot(Base):
     __tablename__ = "analysis_snapshots"
 
