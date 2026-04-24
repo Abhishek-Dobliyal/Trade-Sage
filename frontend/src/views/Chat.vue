@@ -77,6 +77,10 @@
     </div>
 
     <div class="p-4 border-t border-gray-800 bg-gray-900/50">
+      <div class="flex items-center justify-center gap-2 mb-2 text-[11px] text-gray-600">
+        <i class="fa-solid fa-triangle-exclamation text-amber-600/50"></i>
+        <span>LLMs can make mistakes. Responses may be slow on the free tier. Not financial advice.</span>
+      </div>
       <form class="flex gap-3 max-w-4xl mx-auto" @submit.prevent="handleSubmit">
         <input
           v-model="input"
