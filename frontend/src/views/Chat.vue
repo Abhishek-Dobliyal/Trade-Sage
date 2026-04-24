@@ -58,13 +58,10 @@
       <!-- Thinking indicator -->
       <div v-if="thinking" class="flex justify-start">
         <div class="bg-gray-800 border border-gray-700 rounded-2xl rounded-bl-md px-5 py-4 animate__animated animate__fadeIn">
-          <div class="flex items-center gap-3">
-            <div class="flex gap-1">
-              <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
-              <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
-              <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
-            </div>
-            <span class="text-xs text-gray-500">Analyzing...</span>
+          <div class="flex gap-1">
+            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
           </div>
         </div>
       </div>
