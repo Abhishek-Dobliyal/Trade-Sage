@@ -34,6 +34,9 @@ Recent News:
 
 RECOMMENDATION_PROMPT = """Based on the portfolio below and current market conditions, generate specific buy/sell/hold recommendations.
 
+IMPORTANT: Only recommend stocks/MFs that are listed in the portfolio below. Do NOT suggest stocks the user does not hold.
+Write full rationale sentences, do NOT truncate or abbreviate with "...".
+
 Respond ONLY with valid JSON. No markdown, no code fences, no explanation outside the JSON.
 Always wrap the array under a "data" key. Use exactly these field names:
 
@@ -43,7 +46,7 @@ Always wrap the array under a "data" key. Use exactly these field names:
       "symbol": "RELIANCE",
       "name": "Reliance Industries Ltd",
       "action": "BUY",
-      "rationale": "Strong quarterly results and expanding retail business...",
+      "rationale": "Strong quarterly results with 15% YoY revenue growth and expanding retail business provides solid upside potential in the medium term.",
       "confidence": 0.75,
       "target_price": 2800.00,
       "stop_loss": 2300.00
