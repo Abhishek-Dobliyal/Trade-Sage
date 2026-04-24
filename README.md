@@ -2,6 +2,12 @@
 
 An AI-powered trading research assistant for the Indian stock market. Analyze your portfolio, get LLM-driven buy/sell/hold recommendations, track market data, and chat with an AI advisor -- all from a local-first dark-themed terminal UI.
 
+## Screenshots
+
+| Dashboard | Chat | Recommendations |
+|:-:|:-:|:-:|
+| ![Dashboard](docs/screenshots/tradesage_dashboard.png) | ![Chat](docs/screenshots/tradesage_chat.png) | ![Recommendations](docs/screenshots/tradesage_recommend.png) |
+
 ## Features
 
 ### Portfolio Management
