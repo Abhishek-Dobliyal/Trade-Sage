@@ -1,19 +1,29 @@
 <template>
   <div class="flex flex-col h-screen">
     <PageHeader title="Portfolio">
-      <button
-        v-if="holdings.length"
-        class="text-sm text-rose-400 hover:text-rose-300 transition-colors"
-        @click="handleClear"
-      >
-        <i class="fa-solid fa-trash mr-1"></i> Clear
-      </button>
+      <div class="flex items-center gap-3">
+        <button
+          v-if="holdings.length"
+          class="text-gray-500 hover:text-gray-300 transition-colors"
+          @click="toggle"
+          :title="hidden ? 'Show values' : 'Hide values'"
+        >
+          <i :class="['fa-solid text-sm', hidden ? 'fa-eye-slash' : 'fa-eye']"></i>
+        </button>
+        <button
+          v-if="holdings.length"
+          class="text-sm text-rose-400 hover:text-rose-300 transition-colors"
+          @click="handleClear"
+        >
+          <i class="fa-solid fa-trash mr-1"></i> Clear
+        </button>
+      </div>
     </PageHeader>
 
     <div class="flex-1 overflow-y-auto p-6 space-y-6">
       <!-- CSV Upload -->
       <div
-        class="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center hover:border-emerald-500/30 transition-colors"
+        class="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center hover:border-emerald-500/30 transition-colors animate__animated animate__fadeIn"
         @dragover.prevent
         @drop.prevent="handleDrop"
       >
@@ -26,7 +36,8 @@
           <i class="fa-solid fa-file-csv mr-2"></i> Browse Files
           <input type="file" accept=".csv" class="hidden" @change="handleFileSelect" />
         </label>
-        <div v-if="importStatus" :class="['text-sm mt-3', importStatus.ok ? 'text-emerald-400' : 'text-rose-400']">
+        <div v-if="importStatus" :class="['text-sm mt-3 animate__animated animate__fadeIn', importStatus.ok ? 'text-emerald-400' : 'text-rose-400']">
+          <i :class="['fa-solid mr-1', importStatus.ok ? 'fa-circle-check' : 'fa-circle-xmark']"></i>
           {{ importStatus.message }}
         </div>
       </div>
@@ -38,9 +49,11 @@
       <template v-if="holdings.length">
         <div class="space-y-6">
           <!-- Holdings Table -->
-          <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden flex flex-col max-h-[28rem]">
-            <div class="p-4 border-b border-gray-700 shrink-0">
-              <h3 class="text-sm font-medium text-gray-400">Holdings ({{ holdings.length }})</h3>
+          <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden flex flex-col max-h-[28rem] animate__animated animate__fadeIn">
+            <div class="p-4 border-b border-gray-700 shrink-0 flex items-center justify-between">
+              <h3 class="text-sm font-medium text-gray-400">
+                <i class="fa-solid fa-table-list mr-1.5 text-gray-600"></i>Holdings ({{ holdings.length }})
+              </h3>
             </div>
             <div class="overflow-auto">
               <table class="w-full text-sm">
@@ -69,13 +82,14 @@
                           h.asset_type === 'STOCK' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-400',
                         ]"
                       >
+                        <i :class="['fa-solid text-[10px] mr-0.5', h.asset_type === 'STOCK' ? 'fa-chart-simple' : 'fa-building-columns']"></i>
                         {{ h.asset_type }}
                       </span>
                     </td>
-                    <td class="px-4 py-3 text-right text-gray-300">{{ h.quantity }}</td>
-                    <td class="px-4 py-3 text-right text-gray-300">₹{{ formatNum(h.avg_price) }}</td>
+                    <td class="px-4 py-3 text-right text-gray-300">{{ hidden ? '••' : h.quantity }}</td>
+                    <td class="px-4 py-3 text-right text-gray-300">{{ hidden ? '₹••••' : '₹' + formatNum(h.avg_price) }}</td>
                     <td class="px-4 py-3 text-right text-gray-200 font-medium">
-                      ₹{{ formatNum(h.quantity * h.avg_price) }}
+                      {{ hidden ? '₹••••••' : '₹' + formatNum(h.quantity * h.avg_price) }}
                     </td>
                   </tr>
                 </tbody>
@@ -84,8 +98,10 @@
           </div>
 
           <!-- Sector Allocation Chart -->
-          <div class="bg-gray-800 border border-gray-700 rounded-xl p-5">
-            <h3 class="text-sm font-medium text-gray-400 mb-4">Sector Allocation</h3>
+          <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 animate__animated animate__fadeIn">
+            <h3 class="text-sm font-medium text-gray-400 mb-4">
+              <i class="fa-solid fa-chart-pie mr-1.5 text-gray-600"></i>Sector Allocation
+            </h3>
             <div v-if="sectorEntries.length" class="h-64">
               <Bar :data="barData" :options="barOptions" />
             </div>
@@ -115,11 +131,13 @@ import {
 } from 'chart.js'
 import PageHeader from '../components/layout/PageHeader.vue'
 import { usePortfolio } from '../composables/usePortfolio'
+import { usePrivacy } from '../composables/usePrivacy'
 import { formatNum } from '../utils/format'
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip)
 
 const { holdings, loading, error, fetchHoldings, importCsv, clearHoldings } = usePortfolio()
+const { hidden, toggle } = usePrivacy()
 const importStatus = ref(null)
 
 onMounted(fetchHoldings)

@@ -3,7 +3,7 @@
     <div
       v-for="idx in indices"
       :key="idx.name"
-      class="bg-gray-800 border border-gray-700 rounded-xl p-4 animate__animated animate__fadeIn"
+      class="bg-gray-800 border border-gray-700 rounded-xl p-4 animate__animated animate__fadeIn hover:border-gray-600 transition-colors"
     >
       <div class="flex items-center justify-between mb-2">
         <span class="text-sm text-gray-400 font-medium">{{ idx.name }}</span>

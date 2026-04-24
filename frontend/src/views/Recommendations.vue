@@ -24,7 +24,7 @@
         <div
           v-for="rec in recommendations"
           :key="rec.symbol"
-          class="bg-gray-800 border border-gray-700 rounded-xl p-5 animate__animated animate__fadeInUp"
+          class="bg-gray-800 border border-gray-700 rounded-xl p-5 hover:border-gray-600 transition-colors animate__animated animate__fadeInUp"
         >
           <div class="flex items-center justify-between mb-3">
             <span
@@ -33,6 +33,7 @@
                 actionClass(rec.action),
               ]"
             >
+              <i :class="['fa-solid text-[10px] mr-0.5', actionIcon(rec.action)]"></i>
               {{ rec.action }}
             </span>
             <div class="flex items-center gap-1.5">
@@ -53,10 +54,12 @@
 
           <div v-if="rec.target_price || rec.stop_loss" class="flex gap-4 mb-3 text-xs">
             <div v-if="rec.target_price">
+              <i class="fa-solid fa-bullseye text-emerald-600 mr-0.5"></i>
               <span class="text-gray-500">Target: </span>
               <span class="text-emerald-400 font-medium">₹{{ formatNum(rec.target_price) }}</span>
             </div>
             <div v-if="rec.stop_loss">
+              <i class="fa-solid fa-shield-halved text-rose-600 mr-0.5"></i>
               <span class="text-gray-500">Stop Loss: </span>
               <span class="text-rose-400 font-medium">₹{{ formatNum(rec.stop_loss) }}</span>
             </div>
@@ -87,6 +90,14 @@ import { formatNum, actionClass } from '../utils/format'
 const { recommendations, loading, generating, error, fetchRecommendations, generateRecommendations } = useRecommendations()
 
 onMounted(fetchRecommendations)
+
+function actionIcon(action) {
+  switch (action) {
+    case 'BUY': return 'fa-arrow-trend-up'
+    case 'SELL': return 'fa-arrow-trend-down'
+    default: return 'fa-minus'
+  }
+}
 
 function confidenceColor(c) {
   if (c >= 0.7) return 'bg-emerald-500'

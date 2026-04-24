@@ -12,7 +12,9 @@
           <RecentRecs :recommendations="data.recommendations" />
         </div>
         <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 animate__animated animate__fadeIn">
-          <h3 class="text-sm font-medium text-gray-400 mb-4">Latest News</h3>
+          <h3 class="text-sm font-medium text-gray-400 mb-4">
+            <i class="fa-solid fa-rss mr-1.5 text-orange-500/60"></i>Latest News
+          </h3>
           <div v-if="data.news.length" class="space-y-3">
             <a
               v-for="(item, i) in data.news"
