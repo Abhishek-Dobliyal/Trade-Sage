@@ -51,10 +51,7 @@
             v-html="renderMarkdown(msg.content)"
           ></div>
           <span v-else>{{ msg.content }}</span>
-          <span
-            v-if="msg.role === 'assistant' && streaming && i === messages.length - 1"
-            class="inline-block w-1.5 h-4 bg-emerald-400 ml-1 animate-pulse rounded-sm"
-          ></span>
+
         </div>
       </div>
 
