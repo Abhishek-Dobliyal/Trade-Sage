@@ -36,6 +36,11 @@ export function useChat() {
             if (parsed.conversation_id) {
               conversationId.value = parsed.conversation_id
             }
+            if (parsed.error) {
+              thinking.value = false
+              messages.value.push({ role: 'assistant', content: `Error: ${parsed.error}` })
+              break
+            }
             if (parsed.text) {
               if (thinking.value) {
                 thinking.value = false

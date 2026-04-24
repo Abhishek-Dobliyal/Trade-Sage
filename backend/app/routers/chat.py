@@ -115,12 +115,19 @@ async def _stream_and_persist(
     messages: list[dict], conversation_id: str, db: AsyncSession, model: str | None = None
 ):
     full_content = []
-    generator = await chat_completion(messages, model=model, stream=True)
-    async for chunk in generator:
-        text = chunk.get("text", "")
-        if text:
-            full_content.append(text)
-            yield f"data: {json.dumps({'text': text, 'conversation_id': conversation_id})}\n\n"
+    try:
+        generator = await chat_completion(messages, model=model, stream=True)
+        async for chunk in generator:
+            text = chunk.get("text", "")
+            if text:
+                full_content.append(text)
+                yield f"data: {json.dumps({'text': text, 'conversation_id': conversation_id})}\n\n"
+    except Exception as e:
+        log.exception("LLM streaming failed")
+        error_msg = str(e)
+        if "NotFound" in type(e).__name__ or "404" in error_msg:
+            error_msg = f"Model not available. Please select a different model."
+        yield f"data: {json.dumps({'error': error_msg, 'conversation_id': conversation_id})}\n\n"
 
     assistant_content = "".join(full_content)
     if assistant_content:
