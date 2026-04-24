@@ -3,13 +3,24 @@
     <PageHeader title="Market & News" />
     <div class="flex-1 overflow-y-auto p-6 space-y-6">
       <!-- Indices -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div v-if="!indices.length" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div v-for="n in 3" :key="n" class="bg-gray-800 border border-gray-700 rounded-xl p-4 animate-pulse">
+          <div class="h-4 w-20 bg-gray-700 rounded mb-3"></div>
+          <div class="h-7 w-28 bg-gray-700 rounded mb-2"></div>
+          <div class="h-4 w-24 bg-gray-700 rounded"></div>
+        </div>
+      </div>
+      <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div
-          v-for="idx in indices"
+          v-for="(idx, i) in indices"
           :key="idx.name"
-          class="bg-gray-800 border border-gray-700 rounded-xl p-4"
+          class="bg-gray-800 border border-gray-700 rounded-xl p-4 hover:border-gray-600 transition-colors animate__animated animate__fadeInUp"
+          :style="{ animationDelay: i * 100 + 'ms' }"
         >
-          <div class="text-sm text-gray-400 mb-1">{{ idx.name }}</div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-sm text-gray-400">{{ idx.name }}</span>
+            <i :class="['fa-solid text-xs', idx.change >= 0 ? 'fa-caret-up text-emerald-400' : 'fa-caret-down text-rose-400']"></i>
+          </div>
           <div class="text-2xl font-bold text-gray-100">{{ formatNum(idx.value) }}</div>
           <div
             :class="['text-sm font-medium mt-1', idx.change >= 0 ? 'text-emerald-400' : 'text-rose-400']"
@@ -21,8 +32,10 @@
       </div>
 
       <!-- Stock Lookup -->
-      <div class="bg-gray-800 border border-gray-700 rounded-xl p-5">
-        <h3 class="text-sm font-medium text-gray-400 mb-4">Stock Lookup</h3>
+      <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 animate__animated animate__fadeIn">
+        <h3 class="text-sm font-medium text-gray-400 mb-4">
+          <i class="fa-solid fa-magnifying-glass-chart mr-1.5 text-gray-600"></i>Stock Lookup
+        </h3>
         <form class="flex gap-3 mb-4" @submit.prevent="handleSearch">
           <input
             v-model="searchSymbol"
@@ -43,37 +56,39 @@
           <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ searchError }}
         </div>
 
-        <div v-if="quote" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-          <div>
-            <div class="text-xs text-gray-500">Current Price</div>
+        <div v-if="quote" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 animate__animated animate__fadeIn">
+          <div class="animate__animated animate__fadeInUp" style="animation-delay: 0ms">
+            <div class="text-xs text-gray-500"><i class="fa-solid fa-indian-rupee-sign mr-1 text-gray-600"></i>Current Price</div>
             <div class="text-lg font-semibold text-gray-100">₹{{ formatNum(quote.current_price) }}</div>
           </div>
-          <div>
-            <div class="text-xs text-gray-500">Previous Close</div>
+          <div class="animate__animated animate__fadeInUp" style="animation-delay: 50ms">
+            <div class="text-xs text-gray-500"><i class="fa-solid fa-clock-rotate-left mr-1 text-gray-600"></i>Previous Close</div>
             <div class="text-lg font-semibold text-gray-300">₹{{ formatNum(quote.previous_close) }}</div>
           </div>
-          <div>
-            <div class="text-xs text-gray-500">Day Change</div>
+          <div class="animate__animated animate__fadeInUp" style="animation-delay: 100ms">
+            <div class="text-xs text-gray-500"><i class="fa-solid fa-arrow-right-arrow-left mr-1 text-gray-600"></i>Day Change</div>
             <div :class="['text-lg font-semibold', quote.day_change >= 0 ? 'text-emerald-400' : 'text-rose-400']">
               {{ quote.day_change >= 0 ? '+' : '' }}{{ formatNum(quote.day_change) }}
             </div>
           </div>
-          <div>
-            <div class="text-xs text-gray-500">Change %</div>
+          <div class="animate__animated animate__fadeInUp" style="animation-delay: 150ms">
+            <div class="text-xs text-gray-500"><i class="fa-solid fa-percent mr-1 text-gray-600"></i>Change %</div>
             <div :class="['text-lg font-semibold', quote.day_change_pct >= 0 ? 'text-emerald-400' : 'text-rose-400']">
               {{ quote.day_change_pct >= 0 ? '+' : '' }}{{ quote.day_change_pct }}%
             </div>
           </div>
         </div>
 
-        <div v-if="history.length" class="h-64">
+        <div v-if="history.length" class="h-64 animate__animated animate__fadeIn">
           <Line :data="chartData" :options="chartOptions" />
         </div>
       </div>
 
       <!-- News -->
-      <div class="bg-gray-800 border border-gray-700 rounded-xl p-5">
-        <h3 class="text-sm font-medium text-gray-400 mb-4">Market News</h3>
+      <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 animate__animated animate__fadeIn">
+        <h3 class="text-sm font-medium text-gray-400 mb-4">
+          <i class="fa-solid fa-rss mr-1.5 text-orange-500/60"></i>Market News
+        </h3>
         <div v-if="news.length" class="space-y-3">
           <a
             v-for="(item, i) in news"
@@ -81,7 +96,8 @@
             :href="item.link"
             target="_blank"
             rel="noopener"
-            class="flex items-start gap-3 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-900 transition-colors group"
+            class="flex items-start gap-3 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-900 transition-colors group animate__animated animate__fadeInUp"
+            :style="{ animationDelay: i * 60 + 'ms' }"
           >
             <i class="fa-solid fa-newspaper text-gray-600 mt-0.5"></i>
             <div class="flex-1 min-w-0">
