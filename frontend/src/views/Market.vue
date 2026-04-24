@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-screen">
-    <PageHeader title="Market & News" />
+    <PageHeader title="Market" />
     <div class="flex-1 overflow-y-auto p-6 space-y-6">
       <!-- Indices -->
       <div v-if="!indices.length" class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -84,37 +84,7 @@
         </div>
       </div>
 
-      <!-- News -->
-      <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 animate__animated animate__fadeIn">
-        <h3 class="text-sm font-medium text-gray-400 mb-4">
-          <i class="fa-solid fa-rss mr-1.5 text-orange-500/60"></i>Market News
-        </h3>
-        <div v-if="news.length" class="space-y-3">
-          <a
-            v-for="(item, i) in news"
-            :key="i"
-            :href="item.link"
-            target="_blank"
-            rel="noopener"
-            class="flex items-start gap-3 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-900 transition-colors group animate__animated animate__fadeInUp"
-            :style="{ animationDelay: i * 60 + 'ms' }"
-          >
-            <i class="fa-solid fa-newspaper text-gray-600 mt-0.5"></i>
-            <div class="flex-1 min-w-0">
-              <div class="text-sm text-gray-200 group-hover:text-emerald-400 transition-colors">
-                {{ item.title }}
-              </div>
-              <div class="text-xs text-gray-500 mt-1">
-                {{ item.source }} &middot; {{ formatTime(item.published) }}
-              </div>
-            </div>
-            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-gray-600 group-hover:text-gray-400"></i>
-          </a>
-        </div>
-        <div v-else class="text-gray-500 text-sm">
-          <i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading news...
-        </div>
-      </div>
+
     </div>
   </div>
 </template>
@@ -136,15 +106,12 @@ import { useMarket } from '../composables/useMarket'
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Filler)
 
-import { formatNum, formatTime } from '../utils/format'
+import { formatNum } from '../utils/format'
 
-const { indices, news, quote, history, loading: searchLoading, error: searchError, fetchIndices, fetchNews, fetchQuote, fetchHistory } = useMarket()
+const { indices, quote, history, loading: searchLoading, error: searchError, fetchIndices, fetchQuote, fetchHistory } = useMarket()
 const searchSymbol = ref('')
 
-onMounted(() => {
-  fetchIndices()
-  fetchNews()
-})
+onMounted(fetchIndices)
 
 async function handleSearch() {
   const sym = searchSymbol.value.trim().toUpperCase()

@@ -56,7 +56,7 @@ const navItems = [
   { path: '/portfolio', label: 'Portfolio', icon: 'fa-solid fa-briefcase' },
   { path: '/recommendations', label: 'Recommendations', icon: 'fa-solid fa-lightbulb' },
   { path: '/watchlist', label: 'Watchlist', icon: 'fa-solid fa-binoculars' },
-  { path: '/market', label: 'Market & News', icon: 'fa-solid fa-chart-line' },
+  { path: '/market', label: 'Market', icon: 'fa-solid fa-chart-line' },
 ]
 
 function isActive(path) {
