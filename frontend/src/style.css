@@ -8,13 +8,27 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 0px;
+  display: none;
 }
 
-::-webkit-scrollbar-track {
-  @apply bg-gray-900;
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-::-webkit-scrollbar-thumb {
-  @apply bg-gray-700 rounded-full;
+.prose table {
+  @apply text-xs border-collapse w-max min-w-full;
+}
+
+.prose th {
+  @apply bg-gray-700/50 px-3 py-2 text-left text-gray-300 font-medium border border-gray-700;
+}
+
+.prose td {
+  @apply px-3 py-1.5 border border-gray-700 text-gray-400 whitespace-nowrap;
+}
+
+.prose pre {
+  @apply overflow-x-auto;
 }

@@ -47,7 +47,7 @@
         >
           <div
             v-if="msg.role === 'assistant'"
-            class="prose prose-invert prose-sm max-w-none"
+            class="prose prose-invert prose-sm max-w-none overflow-x-auto"
             v-html="renderMarkdown(msg.content)"
           ></div>
           <span v-else>{{ msg.content }}</span>
