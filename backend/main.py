@@ -62,10 +62,8 @@ async def available_models():
         "default": settings.default_model,
         "models": [
             {"id": "openrouter/free", "name": "Auto (Free)"},
-            {"id": "google/gemma-4-26b-a4b-it:free", "name": "Gemma 4 26B"},
-            {"id": "google/gemma-3-12b-it:free", "name": "Gemma 3 12B"},
-            {"id": "nvidia/nemotron-3-super-120b-a12b:free", "name": "Nemotron 120B"},
-            {"id": "deepseek/deepseek-chat-v3-0324:free", "name": "DeepSeek V3"},
-            {"id": "meta-llama/llama-4-scout:free", "name": "Llama 4 Scout"},
+            {"id": "z-ai/glm-4.5-air:free", "name": "GLM 4.5 Air"},
+            {"id": "google/gemma-3n-e4b-it:free", "name": "Gemma 3n"},
+            {"id": "liquid/lfm-2.5-1.2b-thinking:free", "name": "LFM 2.5 Thinking"},
         ],
     }

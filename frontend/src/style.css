@@ -32,3 +32,17 @@ body {
 .prose pre {
   @apply overflow-x-auto;
 }
+
+button,
+a,
+label[for],
+select,
+[role="button"],
+.cursor-pointer {
+  cursor: pointer;
+}
+
+input,
+textarea {
+  cursor: text;
+}
