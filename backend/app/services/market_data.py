@@ -40,26 +40,34 @@ def get_stock_history(
 ) -> list[dict]:
     """Fetch historical OHLCV data."""
     ticker = yf.Ticker(f"{symbol}.NS")
+    df = None
     try:
         df = ticker.history(period=period, interval=interval)
-    except Exception:
-        log.exception("Failed to fetch history for %s", symbol)
+    except Exception as e:
+        log.warning("yfinance error for %s (%s/%s): %s", symbol, period, interval, e)
         return []
-    if df.empty:
+    if df is None or (hasattr(df, 'empty') and df.empty):
         log.warning("No history data returned for %s (period=%s)", symbol, period)
         return []
-    df = df.reset_index()
-    return [
-        {
-            "date": row["Date"].isoformat(),
-            "open": round(row["Open"], 2),
-            "high": round(row["High"], 2),
-            "low": round(row["Low"], 2),
-            "close": round(row["Close"], 2),
-            "volume": int(row["Volume"]),
-        }
-        for _, row in df.iterrows()
-    ]
+    try:
+        df = df.reset_index()
+    except Exception:
+        return []
+    try:
+        return [
+            {
+                "date": row["Date"].isoformat(),
+                "open": round(row["Open"], 2),
+                "high": round(row["High"], 2),
+                "low": round(row["Low"], 2),
+                "close": round(row["Close"], 2),
+                "volume": int(row["Volume"]),
+            }
+            for _, row in df.iterrows()
+        ]
+    except Exception:
+        log.exception("Failed to parse history data for %s", symbol)
+        return []
 
 
 def get_index_quotes() -> list[dict]:

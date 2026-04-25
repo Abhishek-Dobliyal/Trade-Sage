@@ -2,7 +2,6 @@
   <div class="flex flex-col h-screen">
     <PageHeader title="Market" />
     <div class="flex-1 overflow-y-auto p-6 space-y-6">
-      <!-- Indices -->
       <div v-if="!indices.length" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div v-for="n in 3" :key="n" class="bg-gray-800 border border-gray-700 rounded-xl p-4 animate-pulse">
           <div class="h-4 w-20 bg-gray-700 rounded mb-3"></div>
@@ -22,16 +21,13 @@
             <i :class="['fa-solid text-xs', idx.change >= 0 ? 'fa-caret-up text-emerald-400' : 'fa-caret-down text-rose-400']"></i>
           </div>
           <div class="text-2xl font-bold text-gray-100">{{ formatNum(idx.value) }}</div>
-          <div
-            :class="['text-sm font-medium mt-1', idx.change >= 0 ? 'text-emerald-400' : 'text-rose-400']"
-          >
+          <div :class="['text-sm font-medium mt-1', idx.change >= 0 ? 'text-emerald-400' : 'text-rose-400']">
             {{ idx.change >= 0 ? '+' : '' }}{{ formatNum(idx.change) }}
             ({{ idx.change_pct >= 0 ? '+' : '' }}{{ idx.change_pct }}%)
           </div>
         </div>
       </div>
 
-      <!-- Stock Lookup -->
       <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 animate__animated animate__fadeIn">
         <h3 class="text-sm font-medium text-gray-400 mb-4">
           <i class="fa-solid fa-magnifying-glass-chart mr-1.5 text-gray-600"></i>Stock Lookup
@@ -83,14 +79,12 @@
           <Line :data="chartData" :options="chartOptions" />
         </div>
       </div>
-
-
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, shallowRef, computed, onMounted } from 'vue'
 import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -111,7 +105,12 @@ import { formatNum } from '../utils/format'
 const { indices, quote, history, loading: searchLoading, error: searchError, fetchIndices, fetchQuote, fetchHistory } = useMarket()
 const searchSymbol = ref('')
 
-onMounted(fetchIndices)
+onMounted(() => {
+  fetchIndices()
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && searchError.value) searchError.value = null
+  })
+})
 
 async function handleSearch() {
   const sym = searchSymbol.value.trim().toUpperCase()
@@ -161,6 +160,4 @@ const chartOptions = {
     },
   },
 }
-
-
 </script>

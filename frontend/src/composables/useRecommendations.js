@@ -1,10 +1,10 @@
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
 import api from '../api/client'
 
-const recommendations = ref([])
-const loading = ref(false)
-const generating = ref(false)
-const error = ref(null)
+const recommendations = shallowRef([])
+const loading = shallowRef(false)
+const generating = shallowRef(false)
+const error = shallowRef(null)
 
 export function useRecommendations() {
   async function fetchRecommendations() {

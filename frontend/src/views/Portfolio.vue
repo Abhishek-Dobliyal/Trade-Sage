@@ -30,149 +30,179 @@
     </PageHeader>
 
     <div class="flex-1 overflow-y-auto p-6 space-y-6">
-      <!-- Valuation Summary -->
-      <div
-        v-if="valuation"
-        class="grid grid-cols-2 md:grid-cols-4 gap-4 animate__animated animate__fadeIn"
-      >
-        <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
-          <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-coins mr-1"></i>Invested</div>
-          <div class="text-lg font-bold text-gray-100">
-            {{ hidden ? '₹••••••' : '₹' + formatNum(valuation.summary.total_invested) }}
+      <div v-if="loading" class="animate-pulse space-y-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div v-for="n in 4" :key="n" class="bg-gray-800 border border-gray-700 rounded-xl p-4">
+            <div class="h-3 w-16 bg-gray-700 rounded mb-2"></div>
+            <div class="h-6 w-20 bg-gray-700 rounded"></div>
           </div>
         </div>
-        <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
-          <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-sack-dollar mr-1"></i>Current</div>
-          <div class="text-lg font-bold text-gray-100">
-            {{ hidden ? '₹••••••' : '₹' + formatNum(valuation.summary.total_current) }}
+        <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden">
+          <div class="p-4 border-b border-gray-700">
+            <div class="h-4 w-32 bg-gray-700 rounded"></div>
+          </div>
+          <div class="p-4 space-y-3">
+            <div v-for="n in 6" :key="n" class="h-10 bg-gray-700/50 rounded-lg"></div>
           </div>
         </div>
-        <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
-          <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-chart-line mr-1"></i>P&L</div>
-          <div :class="['text-lg font-bold', valuation.summary.total_pnl >= 0 ? 'text-emerald-400' : 'text-rose-400']">
-            {{ hidden ? '••••' : (valuation.summary.total_pnl >= 0 ? '+' : '') + '₹' + formatNum(Math.abs(valuation.summary.total_pnl)) }}
-          </div>
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-5">
+          <div class="h-4 w-28 bg-gray-700 rounded mb-4"></div>
+          <div class="h-64 bg-gray-700/50 rounded-lg"></div>
         </div>
-        <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
-          <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-percent mr-1"></i>Returns</div>
-          <div :class="['text-lg font-bold', valuation.summary.total_pnl_pct >= 0 ? 'text-emerald-400' : 'text-rose-400']">
-            {{ hidden ? '••%' : (valuation.summary.total_pnl_pct >= 0 ? '+' : '') + valuation.summary.total_pnl_pct + '%' }}
+      </div>
+
+      <div v-else-if="error" class="bg-rose-500/10 border border-rose-500/20 rounded-xl p-5">
+        <div class="flex items-start gap-3">
+          <i class="fa-solid fa-circle-exclamation text-rose-400 text-xl mt-0.5"></i>
+          <div>
+            <div class="text-rose-400 font-medium mb-1">Failed to load portfolio</div>
+            <div class="text-sm text-gray-400">{{ error }}</div>
+            <button
+              class="mt-3 px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 rounded-lg text-xs text-rose-400 transition-colors"
+              @click="fetchHoldings"
+            >
+              <i class="fa-solid fa-rotate-right mr-1"></i> Retry
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- CSV Upload -->
-      <div
-        class="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center hover:border-emerald-500/30 transition-colors animate__animated animate__fadeIn"
-        @dragover.prevent
-        @drop.prevent="handleDrop"
-      >
-        <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-600 mb-3"></i>
-        <p class="text-sm text-gray-400 mb-1">Drag & drop your portfolio CSV here</p>
-        <p class="text-xs text-gray-600 mb-4">
-          Required columns: symbol, name, type, quantity, avg_price
-        </p>
-        <label class="inline-flex items-center px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 hover:border-emerald-500/30 cursor-pointer transition-colors">
-          <i class="fa-solid fa-file-csv mr-2"></i> Browse Files
-          <input type="file" accept=".csv" class="hidden" @change="handleFileSelect" />
-        </label>
-        <div v-if="importStatus" :class="['text-sm mt-3 animate__animated animate__fadeIn', importStatus.ok ? 'text-emerald-400' : 'text-rose-400']">
-          <i :class="['fa-solid mr-1', importStatus.ok ? 'fa-circle-check' : 'fa-circle-xmark']"></i>
-          {{ importStatus.message }}
+      <template v-else>
+        <div
+          v-if="valuation"
+          class="grid grid-cols-2 md:grid-cols-4 gap-4 animate__animated animate__fadeIn"
+        >
+          <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
+            <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-coins mr-1"></i>Invested</div>
+            <div class="text-lg font-bold text-gray-100">
+              {{ hidden ? '₹••••••' : '₹' + formatNum(valuation.summary.total_invested) }}
+            </div>
+          </div>
+          <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
+            <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-sack-dollar mr-1"></i>Current</div>
+            <div class="text-lg font-bold text-gray-100">
+              {{ hidden ? '₹••••••' : '₹' + formatNum(valuation.summary.total_current) }}
+            </div>
+          </div>
+          <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
+            <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-chart-line mr-1"></i>P&L</div>
+            <div :class="['text-lg font-bold', valuation.summary.total_pnl >= 0 ? 'text-emerald-400' : 'text-rose-400']">
+              {{ hidden ? '••••' : (valuation.summary.total_pnl >= 0 ? '+' : '') + '₹' + formatNum(Math.abs(valuation.summary.total_pnl)) }}
+            </div>
+          </div>
+          <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
+            <div class="text-xs text-gray-500 mb-1"><i class="fa-solid fa-percent mr-1"></i>Returns</div>
+            <div :class="['text-lg font-bold', valuation.summary.total_pnl_pct >= 0 ? 'text-emerald-400' : 'text-rose-400']">
+              {{ hidden ? '••%' : (valuation.summary.total_pnl_pct >= 0 ? '+' : '') + valuation.summary.total_pnl_pct + '%' }}
+            </div>
+          </div>
         </div>
-      </div>
+        <div v-if="valuation && hasOnlyMF" class="text-xs text-gray-600 bg-gray-800/50 rounded-lg px-3 py-2 inline-block">
+          <i class="fa-solid fa-circle-info mr-1"></i>
+          Mutual Funds don't have live P&L — values shown are at NAV from last import. Live P&L only available for stocks.
+        </div>
 
-      <div v-if="loading" class="flex items-center justify-center py-10">
-        <i class="fa-solid fa-spinner fa-spin text-2xl text-gray-500"></i>
-      </div>
+        <div
+          class="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center hover:border-emerald-500/30 transition-colors animate__animated animate__fadeIn"
+          @dragover.prevent
+          @drop.prevent="handleDrop"
+        >
+          <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-600 mb-3"></i>
+          <p class="text-sm text-gray-400 mb-1">Drag & drop your portfolio CSV here</p>
+          <p class="text-xs text-gray-600 mb-4">
+            Required columns: symbol, name, type, quantity, avg_price
+          </p>
+          <label class="inline-flex items-center px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 hover:border-emerald-500/30 cursor-pointer transition-colors">
+            <i class="fa-solid fa-file-csv mr-2"></i> Browse Files
+            <input type="file" accept=".csv" class="hidden" @change="handleFileSelect" />
+          </label>
+          <div v-if="importStatus" :class="['text-sm mt-3 animate__animated animate__fadeIn', importStatus.ok ? 'text-emerald-400' : 'text-rose-400']">
+            <i :class="['fa-solid mr-1', importStatus.ok ? 'fa-circle-check' : 'fa-circle-xmark']"></i>
+            {{ importStatus.message }}
+          </div>
+        </div>
 
-      <template v-if="displayHoldings.length">
-        <div class="space-y-6">
-          <!-- Holdings Table -->
-          <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden flex flex-col max-h-[28rem] animate__animated animate__fadeIn">
-            <div class="p-4 border-b border-gray-700 shrink-0 flex items-center justify-between">
-              <h3 class="text-sm font-medium text-gray-400">
-                <i class="fa-solid fa-table-list mr-1.5 text-gray-600"></i>Holdings ({{ displayHoldings.length }})
+        <template v-if="displayHoldings.length">
+          <div class="space-y-6">
+            <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden flex flex-col max-h-[28rem] animate__animated animate__fadeIn">
+              <div class="p-4 border-b border-gray-700 shrink-0 flex items-center justify-between">
+                <h3 class="text-sm font-medium text-gray-400">
+                  <i class="fa-solid fa-table-list mr-1.5 text-gray-600"></i>Holdings ({{ displayHoldings.length }})
+                </h3>
+              </div>
+              <div class="overflow-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="text-left text-xs text-gray-500 border-b border-gray-700">
+                      <th class="px-4 py-3 font-medium">Symbol</th>
+                      <th class="px-4 py-3 font-medium">Name</th>
+                      <th class="px-4 py-3 font-medium">Type</th>
+                      <th class="px-4 py-3 font-medium text-right">Qty</th>
+                      <th class="px-4 py-3 font-medium text-right">Avg Price</th>
+                      <th class="px-4 py-3 font-medium text-right">Invested</th>
+                      <th v-if="valuation" class="px-4 py-3 font-medium text-right">CMP</th>
+                      <th v-if="valuation" class="px-4 py-3 font-medium text-right">P&L</th>
+                      <th v-if="valuation" class="px-4 py-3 font-medium text-right">Day %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="h in displayHoldings"
+                      :key="h.id || h.symbol"
+                      class="border-b border-gray-700/50 hover:bg-gray-700/20 transition-colors cursor-pointer"
+                      @click="openDrillDown(h.symbol)"
+                    >
+                      <td class="px-4 py-3 font-medium text-gray-200">{{ h.symbol }}</td>
+                      <td class="px-4 py-3 text-gray-400 truncate max-w-48">{{ h.name }}</td>
+                      <td class="px-4 py-3">
+                        <span
+                          :class="[
+                            'px-2 py-0.5 rounded text-xs font-medium',
+                            h.asset_type === 'STOCK' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-400',
+                          ]"
+                        >
+                          <i :class="['fa-solid text-[10px] mr-0.5', h.asset_type === 'STOCK' ? 'fa-chart-simple' : 'fa-building-columns']"></i>
+                          {{ h.asset_type }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-right text-gray-300">{{ hidden ? '••' : h.quantity }}</td>
+                      <td class="px-4 py-3 text-right text-gray-300">{{ hidden ? '₹••••' : '₹' + formatNum(h.avg_price) }}</td>
+                      <td class="px-4 py-3 text-right text-gray-200 font-medium">
+                        {{ hidden ? '₹••••••' : '₹' + formatNum(h.invested || h.quantity * h.avg_price) }}
+                      </td>
+                      <template v-if="valuation">
+                        <td class="px-4 py-3 text-right text-gray-300">
+                          {{ h.current_price ? '₹' + formatNum(h.current_price) : '—' }}
+                        </td>
+                        <td class="px-4 py-3 text-right font-medium" :class="h.pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+                          {{ hidden ? '••' : (h.pnl >= 0 ? '+' : '') + '₹' + formatNum(Math.abs(h.pnl || 0)) }}
+                        </td>
+                        <td class="px-4 py-3 text-right text-xs" :class="(h.day_change_pct || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+                          {{ h.day_change_pct != null ? (h.day_change_pct >= 0 ? '+' : '') + h.day_change_pct + '%' : '—' }}
+                        </td>
+                      </template>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 animate__animated animate__fadeIn">
+              <h3 class="text-sm font-medium text-gray-400 mb-4">
+                <i class="fa-solid fa-chart-pie mr-1.5 text-gray-600"></i>Sector Allocation
               </h3>
-            </div>
-            <div class="overflow-auto">
-              <table class="w-full text-sm">
-                <thead>
-                  <tr class="text-left text-xs text-gray-500 border-b border-gray-700">
-                    <th class="px-4 py-3 font-medium">Symbol</th>
-                    <th class="px-4 py-3 font-medium">Name</th>
-                    <th class="px-4 py-3 font-medium">Type</th>
-                    <th class="px-4 py-3 font-medium text-right">Qty</th>
-                    <th class="px-4 py-3 font-medium text-right">Avg Price</th>
-                    <th class="px-4 py-3 font-medium text-right">Invested</th>
-                    <th v-if="valuation" class="px-4 py-3 font-medium text-right">CMP</th>
-                    <th v-if="valuation" class="px-4 py-3 font-medium text-right">P&L</th>
-                    <th v-if="valuation" class="px-4 py-3 font-medium text-right">Day %</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="h in displayHoldings"
-                    :key="h.id || h.symbol"
-                    class="border-b border-gray-700/50 hover:bg-gray-700/20 transition-colors cursor-pointer"
-                    @click="openDrillDown(h.symbol)"
-                  >
-                    <td class="px-4 py-3 font-medium text-gray-200">{{ h.symbol }}</td>
-                    <td class="px-4 py-3 text-gray-400 truncate max-w-48">{{ h.name }}</td>
-                    <td class="px-4 py-3">
-                      <span
-                        :class="[
-                          'px-2 py-0.5 rounded text-xs font-medium',
-                          h.asset_type === 'STOCK' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-400',
-                        ]"
-                      >
-                        <i :class="['fa-solid text-[10px] mr-0.5', h.asset_type === 'STOCK' ? 'fa-chart-simple' : 'fa-building-columns']"></i>
-                        {{ h.asset_type }}
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-right text-gray-300">{{ hidden ? '••' : h.quantity }}</td>
-                    <td class="px-4 py-3 text-right text-gray-300">{{ hidden ? '₹••••' : '₹' + formatNum(h.avg_price) }}</td>
-                    <td class="px-4 py-3 text-right text-gray-200 font-medium">
-                      {{ hidden ? '₹••••••' : '₹' + formatNum(h.invested || h.quantity * h.avg_price) }}
-                    </td>
-                    <template v-if="valuation">
-                      <td class="px-4 py-3 text-right text-gray-300">
-                        {{ h.current_price ? '₹' + formatNum(h.current_price) : '—' }}
-                      </td>
-                      <td class="px-4 py-3 text-right font-medium" :class="h.pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'">
-                        {{ hidden ? '••' : (h.pnl >= 0 ? '+' : '') + '₹' + formatNum(Math.abs(h.pnl || 0)) }}
-                      </td>
-                      <td class="px-4 py-3 text-right text-xs" :class="(h.day_change_pct || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'">
-                        {{ h.day_change_pct != null ? (h.day_change_pct >= 0 ? '+' : '') + h.day_change_pct + '%' : '—' }}
-                      </td>
-                    </template>
-                  </tr>
-                </tbody>
-              </table>
+              <div v-if="sectorEntries.length" class="h-64">
+                <Bar :data="barData" :options="barOptions" />
+              </div>
+              <div v-else class="text-gray-500 text-sm text-center py-8">
+                No sector data available
+              </div>
             </div>
           </div>
-
-          <!-- Sector Allocation Chart -->
-          <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 animate__animated animate__fadeIn">
-            <h3 class="text-sm font-medium text-gray-400 mb-4">
-              <i class="fa-solid fa-chart-pie mr-1.5 text-gray-600"></i>Sector Allocation
-            </h3>
-            <div v-if="sectorEntries.length" class="h-64">
-              <Bar :data="barData" :options="barOptions" />
-            </div>
-            <div v-else class="text-gray-500 text-sm text-center py-8">
-              No sector data available
-            </div>
-          </div>
-        </div>
+        </template>
       </template>
-
-      <div v-else-if="error" class="text-rose-400 text-sm p-4 bg-rose-500/10 rounded-lg">
-        <i class="fa-solid fa-circle-exclamation mr-2"></i>{{ error }}
-      </div>
     </div>
 
-    <!-- Stock Drill-Down Modal -->
     <div
       v-if="drillDown"
       class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-6"
@@ -191,8 +221,11 @@
           <div v-if="drillDownLoading" class="flex items-center justify-center py-10">
             <i class="fa-solid fa-spinner fa-spin text-2xl text-gray-500"></i>
           </div>
-          <template v-else>
-            <div v-if="drillDownQuote" class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div v-else-if="drillDownError" class="text-rose-400 text-sm p-3 bg-rose-500/10 rounded-lg">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ drillDownError }}
+          </div>
+          <template v-else-if="drillDownQuote">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
                 <div class="text-xs text-gray-500">Current Price</div>
                 <div class="text-lg font-semibold text-gray-100">₹{{ formatNum(drillDownQuote.current_price) }}</div>
@@ -217,6 +250,17 @@
             <div v-if="drillDownHistory.length" class="h-52">
               <Line :data="drillDownChartData" :options="drillDownChartOptions" />
             </div>
+            <div v-else class="text-center py-8 text-gray-500">
+              <i class="fa-solid fa-chart-line text-3xl mb-2 opacity-50"></i>
+              <div class="text-sm">No historical data available</div>
+            </div>
+          </template>
+          <template v-else>
+            <div class="text-center py-8 text-gray-500">
+              <i class="fa-solid fa-chart-simple text-3xl mb-2 opacity-50"></i>
+              <div class="text-sm">Market data not available for this holding</div>
+              <div class="text-xs text-gray-600 mt-1">MFs and some stocks may not have real-time data</div>
+            </div>
           </template>
         </div>
       </div>
@@ -225,7 +269,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, shallowRef, computed, onMounted, onUnmounted } from 'vue'
 import { Bar, Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -249,17 +293,29 @@ const { holdings, valuation, loading, valuationLoading, error, fetchHoldings, fe
 const { hidden, toggle } = usePrivacy()
 const importStatus = ref(null)
 
-// Drill-down state
-const drillDown = ref(null)
-const drillDownQuote = ref(null)
-const drillDownHistory = ref([])
-const drillDownLoading = ref(false)
+const drillDown = shallowRef(null)
+const drillDownQuote = shallowRef(null)
+const drillDownHistory = shallowRef([])
+const drillDownLoading = shallowRef(false)
+const drillDownError = shallowRef(null)
 
 onMounted(fetchHoldings)
+
+function handleKeydown(e) {
+  if (e.key === 'Escape' && drillDown.value) drillDown.value = null
+}
+onMounted(() => window.addEventListener('keydown', handleKeydown))
+onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 
 const displayHoldings = computed(() => {
   if (valuation.value) return valuation.value.holdings
   return holdings.value
+})
+
+const hasOnlyMF = computed(() => {
+  const src = displayHoldings.value
+  if (!src.length) return false
+  return src.every(h => h.asset_type !== 'STOCK')
 })
 
 async function openDrillDown(symbol) {
@@ -267,6 +323,7 @@ async function openDrillDown(symbol) {
   drillDown.value = { symbol }
   drillDownQuote.value = null
   drillDownHistory.value = []
+  drillDownError.value = null
   drillDownLoading.value = true
   try {
     const [quoteRes, histRes] = await Promise.all([
@@ -275,8 +332,8 @@ async function openDrillDown(symbol) {
     ])
     drillDownQuote.value = quoteRes.data
     drillDownHistory.value = histRes.data
-  } catch {
-    // some symbols (MFs) won't have data
+  } catch (err) {
+    drillDownError.value = err.response?.data?.detail || err.message || 'Failed to load stock data'
   } finally {
     drillDownLoading.value = false
   }

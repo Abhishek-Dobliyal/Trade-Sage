@@ -1,15 +1,15 @@
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
 import { streamChat } from '../api/client'
 
-const messages = ref([])
-const conversationId = ref(null)
-const streaming = ref(false)
-const thinking = ref(false)
-const selectedModel = ref(null)
+const messages = shallowRef([])
+const conversationId = shallowRef(null)
+const streaming = shallowRef(false)
+const thinking = shallowRef(false)
+const selectedModel = shallowRef(null)
 
 export function useChat() {
   async function sendMessage(text) {
-    messages.value.push({ role: 'user', content: text })
+    messages.value = [...messages.value, { role: 'user', content: text }]
     thinking.value = true
     streaming.value = true
 
@@ -38,19 +38,20 @@ export function useChat() {
             }
             if (parsed.error) {
               thinking.value = false
-              messages.value.push({ role: 'assistant', content: `Error: ${parsed.error}` })
+              messages.value = [...messages.value, { role: 'assistant', content: `Error: ${parsed.error}` }]
               break
             }
             if (parsed.text) {
               if (thinking.value) {
                 thinking.value = false
-                messages.value.push({ role: 'assistant', content: '' })
+                messages.value = [...messages.value, { role: 'assistant', content: '' }]
                 assistantIdx = messages.value.length - 1
               }
-              messages.value[assistantIdx].content += parsed.text
+              messages.value = messages.value.map((m, i) =>
+                i === assistantIdx ? { ...m, content: m.content + parsed.text } : m
+              )
             }
           } catch {
-            // skip malformed chunks
           }
         }
       }
@@ -58,9 +59,11 @@ export function useChat() {
       thinking.value = false
       const last = messages.value[messages.value.length - 1]
       if (last.role === 'assistant' && !last.content) {
-        last.content = 'Failed to get response. Please try again.'
+        messages.value = messages.value.map((m, i) =>
+          i === messages.value.length - 1 ? { ...m, content: 'Failed to get response. Please try again.' } : m
+        )
       } else if (last.role === 'user') {
-        messages.value.push({ role: 'assistant', content: 'Failed to get response. Please try again.' })
+        messages.value = [...messages.value, { role: 'assistant', content: 'Failed to get response. Please try again.' }]
       }
     } finally {
       streaming.value = false

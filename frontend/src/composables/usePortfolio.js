@@ -1,11 +1,11 @@
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
 import api from '../api/client'
 
-const holdings = ref([])
-const valuation = ref(null)
-const loading = ref(false)
-const valuationLoading = ref(false)
-const error = ref(null)
+const holdings = shallowRef([])
+const valuation = shallowRef(null)
+const loading = shallowRef(false)
+const valuationLoading = shallowRef(false)
+const error = shallowRef(null)
 
 export function usePortfolio() {
   async function fetchHoldings() {

@@ -21,12 +21,35 @@
     </PageHeader>
 
     <div class="flex-1 overflow-y-auto p-6">
-      <div v-if="loading" class="flex items-center justify-center py-20">
-        <i class="fa-solid fa-spinner fa-spin text-2xl text-gray-500"></i>
+      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div v-for="n in 6" :key="n" class="bg-gray-800 border border-gray-700 rounded-xl p-5 animate-pulse">
+          <div class="h-7 w-16 bg-gray-700 rounded mb-3"></div>
+          <div class="space-y-2 mb-3">
+            <div class="h-5 w-32 bg-gray-700 rounded"></div>
+            <div class="h-3 w-24 bg-gray-700/50 rounded"></div>
+          </div>
+          <div class="h-8 bg-gray-700/50 rounded mb-3"></div>
+          <div class="space-y-2">
+            <div class="h-3 w-full bg-gray-700/50 rounded"></div>
+            <div class="h-3 w-3/4 bg-gray-700/50 rounded"></div>
+          </div>
+        </div>
       </div>
 
-      <div v-else-if="error" class="text-rose-400 text-sm p-4 bg-rose-500/10 rounded-lg mb-6">
-        <i class="fa-solid fa-circle-exclamation mr-2"></i>{{ error }}
+      <div v-else-if="error" class="bg-rose-500/10 border border-rose-500/20 rounded-xl p-5 mb-6">
+        <div class="flex items-start gap-3">
+          <i class="fa-solid fa-circle-exclamation text-rose-400 text-xl mt-0.5"></i>
+          <div>
+            <div class="text-rose-400 font-medium mb-1">Failed to load recommendations</div>
+            <div class="text-sm text-gray-400">{{ error }}</div>
+            <button
+              class="mt-3 px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 rounded-lg text-xs text-rose-400 transition-colors"
+              @click="fetchRecommendations"
+            >
+              <i class="fa-solid fa-rotate-right mr-1"></i> Retry
+            </button>
+          </div>
+        </div>
       </div>
 
       <div v-if="recommendations.length" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -78,7 +101,7 @@
         </div>
       </div>
 
-      <div v-else-if="!loading && !generating" class="flex flex-col items-center justify-center py-20 text-center">
+      <div v-else-if="!loading && !generating && !error" class="flex flex-col items-center justify-center py-20 text-center">
         <i class="fa-solid fa-lightbulb text-4xl text-gray-700 mb-4"></i>
         <p class="text-gray-400 mb-2">No recommendations yet</p>
         <p class="text-sm text-gray-600">

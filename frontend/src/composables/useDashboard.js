@@ -1,9 +1,9 @@
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
 import api from '../api/client'
 
-const data = ref(null)
-const loading = ref(false)
-const error = ref(null)
+const data = shallowRef(null)
+const loading = shallowRef(false)
+const error = shallowRef(null)
 
 export function useDashboard() {
   async function fetchDashboard() {

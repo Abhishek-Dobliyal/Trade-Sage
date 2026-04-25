@@ -31,7 +31,84 @@
       </router-link>
     </nav>
 
-    <div class="px-2 py-4 border-t border-gray-800">
+    <div class="px-2 py-4 border-t border-gray-800 space-y-1">
+      <div
+        class="group relative flex items-center px-3 py-2 rounded-lg text-gray-600 hover:text-gray-500 transition-colors cursor-help"
+        title="Keyboard shortcuts"
+      >
+        <i class="fa-solid fa-keyboard w-5 text-center text-xs"></i>
+        <span v-if="!collapsed" class="ml-3 text-xs">Shortcuts</span>
+        <div
+          class="absolute bottom-full left-4 mb-2 w-64 bg-gray-800 border border-gray-700 rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
+        >
+          <div class="text-xs text-gray-400 font-medium mb-2">Keyboard Shortcuts</div>
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Command palette</span>
+              <span class="flex gap-1">
+                <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">Ctrl</kbd>
+                <span class="text-gray-600">+</span>
+                <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">K</kbd>
+              </span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Close modal</span>
+              <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">ESC</kbd>
+            </div>
+            <div class="border-t border-gray-700 pt-1.5 mt-1.5 space-y-1.5">
+              <div class="flex justify-between text-xs">
+                <span class="text-gray-500">Dashboard</span>
+                <span class="flex gap-1">
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">Alt</kbd>
+                  <span class="text-gray-600">+</span>
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">1</kbd>
+                </span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-gray-500">Market</span>
+                <span class="flex gap-1">
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">Alt</kbd>
+                  <span class="text-gray-600">+</span>
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">2</kbd>
+                </span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-gray-500">Portfolio</span>
+                <span class="flex gap-1">
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">Alt</kbd>
+                  <span class="text-gray-600">+</span>
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">3</kbd>
+                </span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-gray-500">Recommendations</span>
+                <span class="flex gap-1">
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">Alt</kbd>
+                  <span class="text-gray-600">+</span>
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">4</kbd>
+                </span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-gray-500">Watchlist</span>
+                <span class="flex gap-1">
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">Alt</kbd>
+                  <span class="text-gray-600">+</span>
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">5</kbd>
+                </span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-gray-500">Chat</span>
+                <span class="flex gap-1">
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">Alt</kbd>
+                  <span class="text-gray-600">+</span>
+                  <kbd class="bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded text-[10px]">6</kbd>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="absolute -bottom-1.5 left-6 w-3 h-3 bg-gray-800 border-r border-b border-gray-700 rotate-45"></div>
+        </div>
+      </div>
       <button
         class="flex items-center px-3 py-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors w-full"
         @click="collapsed = !collapsed"

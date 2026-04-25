@@ -1,12 +1,12 @@
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
 import api from '../api/client'
 
-const indices = ref([])
-const news = ref([])
-const quote = ref(null)
-const history = ref([])
-const loading = ref(false)
-const error = ref(null)
+const indices = shallowRef([])
+const news = shallowRef([])
+const quote = shallowRef(null)
+const history = shallowRef([])
+const loading = shallowRef(false)
+const error = shallowRef(null)
 
 export function useMarket() {
   async function fetchIndices() {
